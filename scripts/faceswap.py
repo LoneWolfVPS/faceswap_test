@@ -13,18 +13,13 @@ from modules.face_restoration import FaceRestoration
 
 from scripts.roop_logging import logger
 from scripts.swapper import UpscaleOptions, swap_face, ImageResult
-from scripts.cimage import check_batch
 from scripts.roop_version import version_flag
 import os
 
 
 def get_models():
-    models_path = os.path.join(
-        scripts.basedir(), "extensions/sd-webui-roop/models/*"
-    )
-    models = glob.glob(models_path)
     models_path = os.path.join(scripts.basedir(), "models/roop/*")
-    models += glob.glob(models_path)
+    models = glob.glob(models_path)
     models = [x for x in models if x.endswith(".onnx") or x.endswith(".pth")]
     return models
 
@@ -177,10 +172,9 @@ class FaceSwapScript(scripts.Script):
             else:
                 logger.error(f"Please provide a source face")
 
-    def postprocess_batch(self, p, *args, **kwargs):
+    def postprocess_batch(self, *args, **kwargs):
         if self.enable:
-            images = kwargs["images"]
-            images[:] = check_batch(images)[:]
+            return images
 
     def postprocess_image(self, p, script_pp: scripts.PostprocessImageArgs, *args):
         if self.enable and self.swap_in_generated:
